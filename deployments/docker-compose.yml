@@ -1,0 +1,22 @@
+services:
+  adaptor:
+    build:
+      context: ..
+      dockerfile: deployments/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - SATELLITE_SERVICE_URL=http://localhost:8090
+      - TELESAT_BASE_URL=https://api.telesat.com/v1
+      - TELESAT_API_KEY=${TELESAT_API_KEY:-}
+
+  # Standalone orbital engine (for development / independent scaling)
+  orbital-engine:
+    build:
+      context: ..
+      dockerfile: deployments/Dockerfile.orbital
+    ports:
+      - "8090:8090"
+    environment:
+      - SATELLITE_SERVICE_PORT=8090

@@ -1,0 +1,168 @@
+module telesat-lightspeed-access-eline {
+    yang-version 1.1;
+    namespace "urn:telesat:lightspeed:access-eline";
+    prefix tls-eline;
+
+    import telesat-lightspeed-types {
+        prefix tls-types;
+    }
+
+    organization
+        "Satellite LSO Adaptor Project";
+
+    description
+        "Data model for Telesat Lightspeed Access E-Line service.
+         Models a point-to-point Carrier Ethernet circuit delivered
+         over the Lightspeed LEO satellite constellation.
+
+         Aligned with:
+         - MEF 106 (Access E-Line product specification)
+         - MEF 23.2.2 (Satellite Performance Tier PT5)
+         - MEF 3.0 Carrier Ethernet certification";
+
+    revision 2026-03-22 {
+        description "Initial revision.";
+    }
+
+    // --- Service Instance ---
+
+    container access-eline-services {
+        description "Collection of Access E-Line service instances.";
+
+        list service {
+            key "service-id";
+            description "A single Access E-Line service over Lightspeed.";
+
+            leaf service-id {
+                type string;
+                description "Unique service identifier.";
+            }
+
+            leaf service-status {
+                type enumeration {
+                    enum active;
+                    enum provisioning;
+                    enum suspended;
+                    enum terminated;
+                }
+                description "Current service lifecycle state.";
+            }
+
+            leaf service-type {
+                type tls-types:carrier-ethernet-service-type;
+                default access-e-line;
+                description "Carrier Ethernet service type.";
+            }
+
+            leaf performance-tier {
+                type tls-types:performance-tier;
+                default PT5;
+                description "MEF performance tier for SLA objectives.";
+            }
+
+            // Bandwidth
+            container bandwidth {
+                description "Bandwidth parameters.";
+                leaf cir {
+                    type uint32;
+                    units "megabits-per-second";
+                    mandatory true;
+                    description "Committed Information Rate.";
+                }
+                leaf eir {
+                    type uint32;
+                    units "megabits-per-second";
+                    default 0;
+                    description "Excess Information Rate.";
+                }
+            }
+
+            // SLA
+            container sla {
+                description "Service Level Agreement parameters.";
+                uses tls-types:sla-parameters;
+            }
+
+            // Endpoint A (UNI-A)
+            container endpoint-a {
+                description "User Network Interface A.";
+                uses tls-types:geographic-point;
+
+                leaf landing-station {
+                    type string;
+                    description "Nearest landing station serving this endpoint.";
+                }
+
+                container terminal {
+                    description "User terminal at this endpoint.";
+                    leaf terminal-id {
+                        type string;
+                        description "Terminal equipment identifier.";
+                    }
+                    leaf terminal-type {
+                        type tls-types:terminal-type;
+                        description "Antenna technology type.";
+                    }
+                    uses tls-types:terminal-spec;
+                }
+            }
+
+            // Endpoint Z (UNI-Z)
+            container endpoint-z {
+                description "User Network Interface Z.";
+                uses tls-types:geographic-point;
+
+                leaf landing-station {
+                    type string;
+                    description "Nearest landing station serving this endpoint.";
+                }
+
+                container terminal {
+                    description "User terminal at this endpoint.";
+                    leaf terminal-id {
+                        type string;
+                        description "Terminal equipment identifier.";
+                    }
+                    leaf terminal-type {
+                        type tls-types:terminal-type;
+                        description "Antenna technology type.";
+                    }
+                    uses tls-types:terminal-spec;
+                }
+            }
+
+            // Satellite path metadata (extension beyond MEF standard)
+            container satellite-path {
+                description
+                    "Satellite-specific path information. This extends
+                     the standard MEF Access E-Line model with orbital context.";
+
+                leaf estimated-latency {
+                    type decimal64 { fraction-digits 2; }
+                    units "milliseconds";
+                    config false;
+                    description "Estimated one-way latency for this path.";
+                }
+
+                leaf satellite-hops {
+                    type uint8;
+                    config false;
+                    description "Number of inter-satellite link hops.";
+                }
+
+                leaf ground-distance {
+                    type decimal64 { fraction-digits 1; }
+                    units "kilometers";
+                    config false;
+                    description "Great-circle distance between endpoints.";
+                }
+
+                leaf path-description {
+                    type string;
+                    config false;
+                    description "Human-readable path description.";
+                }
+            }
+        }
+    }
+}

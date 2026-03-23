@@ -1,0 +1,11 @@
+FROM python:3.13-slim
+
+RUN useradd -r -s /bin/false appuser
+
+COPY python/ /app/python/
+WORKDIR /app
+
+USER appuser
+EXPOSE 8090
+
+CMD ["python3", "/app/python/server.py"]

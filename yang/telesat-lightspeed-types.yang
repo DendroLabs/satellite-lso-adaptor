@@ -1,0 +1,148 @@
+module telesat-lightspeed-types {
+    yang-version 1.1;
+    namespace "urn:telesat:lightspeed:types";
+    prefix tls-types;
+
+    organization
+        "Satellite LSO Adaptor Project";
+
+    contact
+        "github.com/DendroLabs/satellite-lso-adaptor";
+
+    description
+        "Common type definitions for Telesat Lightspeed satellite
+         Carrier Ethernet services. Aligned with MEF 3.0 CE and
+         MEF 23.2.2 Performance Tier 5 (satellite).";
+
+    revision 2026-03-22 {
+        description "Initial revision.";
+    }
+
+    // --- Performance Tier 5 types ---
+
+    typedef performance-tier {
+        type enumeration {
+            enum PT0.3 { description "Metro/regional tier"; }
+            enum PT1 { description "National tier"; }
+            enum PT2 { description "International tier"; }
+            enum PT3 { description "Intercontinental tier"; }
+            enum PT4 { description "Diverse intercontinental tier"; }
+            enum PT5 { description "Satellite tier (MEF 23.2.2)"; }
+        }
+        default PT5;
+        description
+            "MEF performance tier classification. PT5 is the satellite
+             tier added by MEF 23.2.2 for LEO/GEO satellite services.";
+    }
+
+    typedef carrier-ethernet-service-type {
+        type enumeration {
+            enum access-e-line {
+                description "MEF Access E-Line (point-to-point)";
+            }
+            enum e-access {
+                description "MEF E-Access (access segment)";
+            }
+            enum e-line {
+                description "MEF E-Line (point-to-point)";
+            }
+        }
+        description "Supported Carrier Ethernet service types over Lightspeed.";
+    }
+
+    typedef terminal-type {
+        type enumeration {
+            enum AESA {
+                description "Active Electronically Steered Array";
+            }
+            enum FPA {
+                description "Flat Panel Antenna";
+            }
+            enum VICTS {
+                description "Variable Inclination Continuous Transverse Stub";
+            }
+            enum dual-reflector {
+                description "Traditional dual-reflector parabolic antenna";
+            }
+        }
+        description "Telesat Lightspeed approved user terminal antenna types.";
+    }
+
+    typedef landing-station-status {
+        type enumeration {
+            enum operational { description "Fully operational"; }
+            enum under-construction { description "Under construction"; }
+            enum planned { description "Planned, not yet started"; }
+        }
+    }
+
+    // --- Groupings ---
+
+    grouping geographic-point {
+        description "A geographic coordinate pair.";
+        leaf latitude {
+            type decimal64 { fraction-digits 6; }
+            units "degrees";
+            description "WGS84 latitude (-90 to 90).";
+        }
+        leaf longitude {
+            type decimal64 { fraction-digits 6; }
+            units "degrees";
+            description "WGS84 longitude (-180 to 180).";
+        }
+    }
+
+    grouping sla-parameters {
+        description
+            "Service Level Agreement parameters aligned with
+             MEF 23.2.2 PT5 Class of Service Performance Objectives.";
+        leaf availability {
+            type decimal64 { fraction-digits 2; }
+            units "percent";
+            default 99.9;
+            description "Service availability target.";
+        }
+        leaf max-one-way-delay {
+            type uint32;
+            units "milliseconds";
+            default 150;
+            description "Maximum one-way frame delay (PT5 constraint).";
+        }
+        leaf max-delay-variation {
+            type uint32;
+            units "milliseconds";
+            default 30;
+            description "Maximum frame delay variation / jitter (PT5 constraint).";
+        }
+        leaf max-frame-loss-ratio {
+            type decimal64 { fraction-digits 4; }
+            units "percent";
+            default 0.1;
+            description "Maximum frame loss ratio (PT5 constraint).";
+        }
+    }
+
+    grouping terminal-spec {
+        description "User terminal hardware specifications.";
+        leaf antenna-size {
+            type uint16;
+            units "centimeters";
+            description "Antenna aperture size.";
+        }
+        leaf gain-temperature-ratio {
+            type decimal64 { fraction-digits 1; }
+            units "dB/K";
+            description "G/T ratio.";
+        }
+        leaf eirp {
+            type decimal64 { fraction-digits 1; }
+            units "dBW";
+            description "Effective Isotropic Radiated Power.";
+        }
+        leaf max-throughput {
+            type uint32;
+            units "megabits-per-second";
+            description "Maximum achievable throughput.";
+        }
+    }
+}
