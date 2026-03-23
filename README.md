@@ -267,4 +267,4 @@ python3 -m pytest python/tests/ -v
 
 ## License
 
-Apache 2.0
+Copyright 2026 DendroLabs. All rights reserved.
